@@ -22,6 +22,7 @@ The goals / steps of this project are the following:
 [image5]: ./examples/masked_edge.png "masked edges"
 [image6]: ./examples/rho3_theta1000_28.png "masked edges"
 [image7]: ./examples/nightWhiteDottedMissed.jpg "not work for night"
+[image8]: ./examples/avgLeftRightLine.jpg "only two lines"
 ---
 
 ### Reflection
@@ -52,6 +53,8 @@ My pipeline consisted of 5 steps.
 
   ![rho =3 and theta = pi/1000][image6]
 
+6. Filter the lines and find the left and right line and only draw them. This results only two solid lines, and the result photo is much cleaner.
+  ![two lines][image8]
 
 
 ### 2. Identify potential shortcomings with your current pipeline
@@ -60,12 +63,17 @@ In the first version of the pipeline, I am using the following vertices. This is
 ```
 vertices = np.array([[(60, image.shape[0]),(450, 320), (510, 320), (900, image.shape[0])]], dtype=np.int32)
 ```    
+![missed the right line][image7]
 
-After testing with dash cam image from my own car, I decided to improve it.
+This does not sounds like too much of a problem because in real use case, the parameters are calibrated to each of the specific car model. I can assume the view from the same car will be fixed.
 
+Still, my current approach have several drawbacks:
+1. it will not adapt to case where there is a turn or car is going up hill or down hill. All these cases will fail the fix region approach.
+2. Non-lane lines. Any lines which appears in the region of interest will be detected. The current algorithm cannot distinguish between the valid lines and the other lines. For example, in the challenge.mp4, there are many lines appears in the region of interest that messed things up.  
 
 ### 3. Suggest possible improvements to your pipeline
 
-A possible improvement would be to ...
-
-Another potential improvement could be to ...
+Build adaptive region detection.
+1. detect all lines that appears in the lower half of the image. This is to make sure we capture all possible lane lines.
+2. Because the nature of the lane lines will intercept at roughly the same point, we can find the point which is intercept at roughly the center of the view. It will pick only lines intercepts near the center of the image.
+3. After that, we pick the two lines closes to the center vertical line.

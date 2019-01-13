@@ -47,6 +47,66 @@ def region_of_interest(img, vertices):
     masked_image = cv2.bitwise_and(img, mask)
     return masked_image
 
+def calculateXFromY(m, b, y, shape):
+    x = (y - b)/m
+    if x < 0:
+        x = 0
+        y = b
+    if x > shape[1]:
+        x = shape[1]
+        y = shape[1]*m + b
+    return [int(x), int(y)]
+
+def detect_left_right_lines(lines, shape):
+    leftLines = []
+    rightLines = []
+    for line in lines:
+        for x1,y1,x2,y2 in line:
+            if (x1 != x2):
+                if ((y2-y1)/(x2-x1) < 0): # left line
+                    leftLines.append(line)
+                else:
+                    rightLines.append(line)
+
+    result = []
+    if len(leftLines) > 0:
+        b = []
+        m = []
+        maxX = 0;
+        for line in leftLines:
+            for x1,y1,x2,y2 in line:
+                if (x1 > maxX):
+                    maxX = x1
+                if (x2 > maxX):
+                    maxX = x2
+                p = np.polyfit([x1, x2], [y1, y2], 1)
+                b.append(p[1])
+                m.append(p[0])
+        avgB = sum(b)/float(len(b))
+        avgM = sum(m)/float(len(m))
+        point = calculateXFromY(avgM, avgB, shape[0], shape)
+        result.append([[point[0], point[1], maxX, int(avgM*maxX+avgB)]])
+
+    if len(rightLines) > 0:
+        b = []
+        m = []
+        minX = 100000;
+        for line in rightLines:
+            for x1,y1,x2,y2 in line:
+                if (x1 < minX):
+                    minX = x1
+                if (x2 < minX):
+                    minX = x2
+                p = np.polyfit([x1, x2], [y1, y2], 1)
+                b.append(p[1])
+                m.append(p[0])
+        avgB = sum(b)/float(len(b))
+        avgM = sum(m)/float(len(m))
+        point = calculateXFromY(avgM, avgB, shape[0], shape)
+        result.append([[minX, int(avgM*minX+avgB), point[0], point[1]]])
+    # print("x1=", x1, " x2=", x2, " y1=", y1, " y2=", y2)
+    return result
+
 def draw_lines(img, lines, color=[255, 0, 0], thickness=6):
     """
     NOTE: this is the function you might want to use as a starting point once you want to
@@ -76,7 +136,9 @@ def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
     """
     lines = cv2.HoughLinesP(img, rho, theta, threshold, np.array([]), minLineLength=min_line_len, maxLineGap=max_line_gap)
     line_img = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
-    draw_lines(line_img, lines)
+    left_right_lines = detect_left_right_lines(lines, img.shape)
+    # print(left_right_lines)
+    draw_lines(line_img, left_right_lines)
     return line_img
 
 # Python 3 has support for cool math symbols.
