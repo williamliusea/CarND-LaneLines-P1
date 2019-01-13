@@ -23,6 +23,7 @@ The goals / steps of this project are the following:
 [image6]: ./examples/rho3_theta1000_28.png "masked edges"
 [image7]: ./examples/nightWhiteDottedMissed.jpg "not work for night"
 [image8]: ./examples/avgLeftRightLine.jpg "only two lines"
+[image9]: ./examples/challenge.jpg "challenge"
 ---
 
 ### Reflection
@@ -56,6 +57,12 @@ My pipeline consisted of 5 steps.
 6. Filter the lines and find the left and right line and only draw them. This results only two solid lines, and the result photo is much cleaner.
   ![two lines][image8]
 
+#### Extra challenge
+
+Handling the challenge.mp4.
+I added a heuristic filter on the degree of the lines. It will only accept lines with an angle with x-axis of degree 30 to 75 and -75 to -30. This effectively filters out most of the noise in the video.
+See the test_videos_output/challenge.mp4 for my result.
+![solved challenge][image9]
 
 ### 2. Identify potential shortcomings with your current pipeline
 

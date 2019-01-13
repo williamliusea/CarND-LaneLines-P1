@@ -63,9 +63,10 @@ def detect_left_right_lines(lines, shape):
     for line in lines:
         for x1,y1,x2,y2 in line:
             if (x1 != x2):
-                if ((y2-y1)/(x2-x1) < 0): # left line
+                tan = (y2-y1)/(x2-x1);
+                if (tan < -0.577 and tan > -3.73): # left line
                     leftLines.append(line)
-                else:
+                elif tan > 0.577 and tan < 3.73:
                     rightLines.append(line)
 
     result = []
@@ -104,6 +105,7 @@ def detect_left_right_lines(lines, shape):
         avgM = sum(m)/float(len(m))
         point = calculateXFromY(avgM, avgB, shape[0], shape)
         result.append([[minX, int(avgM*minX+avgB), point[0], point[1]]])
+
     # print("x1=", x1, " x2=", x2, " y1=", y1, " y2=", y2)
     return result
 
@@ -170,10 +172,10 @@ def process_image(image):
     mask_image = np.zeros_like(edge_image)
     ignore_mask_color = 255
     # plt.imshow(mask_image)
-    vertices = np.array([[(60, image.shape[0]),(450, 320), (510, 320), (900, image.shape[0])]], dtype=np.int32)
+    vertices = np.array([[(0, image.shape[0]),(0, image.shape[0]*3/4), (image.shape[1] / 3, image.shape[0] /2), (image.shape[1]*2/3, image.shape[0]/2), (image.shape[1], image.shape[0] *3/4), (image.shape[1], image.shape[0])]], dtype=np.int32)
     masked_edges_image = region_of_interest(edge_image, vertices)
     # plt.imshow(masked_edges_image)
-    hough_image = hough_lines(masked_edges_image, 2, np.pi/360, 100, 50, 200)
+    hough_image = hough_lines(masked_edges_image, 2, np.pi/360, 50, image.shape[0]/20, image.shape[0]/4)
     #plt.imshow(hough_image)
     result = weighted_img(hough_image, image)
     return result
