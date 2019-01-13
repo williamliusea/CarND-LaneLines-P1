@@ -64,8 +64,10 @@ def detect_left_right_lines(lines, shape):
         for x1,y1,x2,y2 in line:
             if (x1 != x2):
                 tan = (y2-y1)/(x2-x1);
-                if (tan < -0.577 and tan > -3.73): # left line
+                # left line must between -75 to 30 degree in slope
+                if (tan < -0.577 and tan > -3.73):
                     leftLines.append(line)
+                # right line must between 30 to 75 degree in slope
                 elif tan > 0.577 and tan < 3.73:
                     rightLines.append(line)
 

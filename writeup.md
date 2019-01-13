@@ -12,20 +12,6 @@ The goals / steps of this project are the following:
 * Make a pipeline that finds lane lines on the road
 * Reflect on your work in a written report
 
-
-[//]: # (Image References)
-
-[image1]: examples/grayscale.jpg "Grayscale"
-[image2]: examples/rho9_96.png "rho = 9"
-[image3]: examples/rho1_8.png "rho = 1"
-[image4]: examples/edge.png "edges"
-[image5]: examples/masked_edge.png "masked edges"
-[image6]: examples/rho3_theta1000_28.png "masked edges"
-[image7]: examples/nightWhiteDottedMissed.jpg "not work for night"
-[image8]: examples/avgLeftRightLine.jpg "only two lines"
-[image9]: examples/challenge.jpg "challenge"
----
-
 ### Reflection
 
 ### 1. Describe your pipeline. As part of the description, explain how you modified the draw_lines() function.
@@ -33,7 +19,7 @@ The goals / steps of this project are the following:
 My pipeline consisted of 5 steps.
 1. Convert the image into grayscale.
 
-    <img src="examples/grayscale.jpg" width="480" alt="grayscale image" />
+  <img src="examples/grayscale.jpg" width="480" alt="grayscale image" />
 2. Blur the grayscale image with kernel size of 9
 3. Use Canny method with the threshold of low = 50 and high = 150 to detect edges in the blur image.
 
@@ -61,9 +47,18 @@ My pipeline consisted of 5 steps.
 #### Extra challenge
 
 Handling the challenge.mp4.
+Without detecting left line and right line, the result looks messy
+
+  <img src="examples/challenge_before_optimization.jpg" width="480" alt="challenge no optimization" />
+
+Even after I apply the left line and right line detections. The result still looks off.
+  <img src="examples/challenge_with_left_right.jpg" width="480" alt="challenge with left right" />
+
 I added a heuristic filter on the degree of the lines. It will only accept lines with an angle with x-axis of degree 30 to 75 and -75 to -30. This effectively filters out most of the noise in the video.
 See the test_videos_output/challenge.mp4 for my result.
+
   <img src="examples/challenge.jpg" width="480" alt="challenge" />
+
 
 ### 2. Identify potential shortcomings with your current pipeline
 
@@ -71,7 +66,7 @@ In the first version of the pipeline, I am using the following vertices. This is
 ```
 vertices = np.array([[(60, image.shape[0]),(450, 320), (510, 320), (900, image.shape[0])]], dtype=np.int32)
 ```    
-<img src="examples/nightWhiteDottedMissed.jpg" width="480" alt="missed right line" />
+  <img src="examples/nightWhiteDottedMissed.jpg" width="480" alt="missed right line" />
 
 This does not sounds like too much of a problem because in real use case, the parameters are calibrated to each of the specific car model. I can assume the view from the same car will be fixed.
 
